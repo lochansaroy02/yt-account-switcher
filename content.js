@@ -213,9 +213,7 @@
     const seen = new Set();
 
     sections.forEach((section, sectionIndex) => {
-      const header = findFirst(section, (o) => 'email' in o || 'googleAccountHeaderRenderer' in o);
-      const headerData = header && header.googleAccountHeaderRenderer ? header.googleAccountHeaderRenderer : header;
-      const email = readText(headerData && headerData.email);
+      const email = readSectionEmail(section);
 
       for (const item of findAll(section, isAccountItem)) {
         const account = parseAccountItem(item, sectionIndex, email);
@@ -230,6 +228,18 @@
     log('parsed accounts:', accounts);
     if (!accounts.length) warn('Parser found no account items. Paste the raw response (with DEBUG on) to fix the parser.');
     return accounts;
+  }
+
+  /**
+   * Section headers seen so far: none (the active Google account's section),
+   * accountItemSectionHeaderRenderer.title (other accounts), or the older
+   * googleAccountHeaderRenderer.email.
+   */
+  function readSectionEmail(section) {
+    const header = section.header || {};
+    const data = header.accountItemSectionHeaderRenderer || header.googleAccountHeaderRenderer || header;
+    const text = readText(data.email) || readText(data.title);
+    return text.includes('@') ? text : '';
   }
 
   function parseAccountItem(item, sectionIndex, sectionEmail) {
@@ -478,7 +488,10 @@
         if (signin.protocol === 'https:' && ALLOWED_SWITCH_HOSTS.has(signin.hostname)) {
           if (!signin.searchParams.has('skip_identity_prompt')) signin.searchParams.set('skip_identity_prompt', 'true');
           if (signin.searchParams.has('next')) {
-            signin.searchParams.set('next', target.pathname + target.search + target.hash);
+            // Keep YouTube's format: it sends an absolute URL here.
+            const original = signin.searchParams.get('next') || '';
+            const isAbsolute = /^https?:/i.test(original);
+            signin.searchParams.set('next', isAbsolute ? target.href : target.pathname + target.search + target.hash);
             return signin.href;
           }
           if (signin.searchParams.has('continue')) {
