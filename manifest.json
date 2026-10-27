@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "YT Hover Account Switcher",
+  "name": "Hover Switcher",
   "version": "1.0.0",
   "description": "Hover the YouTube avatar to see all signed-in accounts and switch with one click.",
   "icons": {
@@ -16,12 +16,20 @@
       "32": "icons/icon32.png"
     }
   },
-  "host_permissions": ["https://www.youtube.com/*"],
+  "host_permissions": [
+    "https://www.youtube.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*"],
-      "js": ["content.js"],
-      "css": ["styles.css"],
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ],
       "run_at": "document_idle",
       "all_frames": false
     }
