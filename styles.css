@@ -1,0 +1,261 @@
+/* YT Hover Account Switcher — dropdown styles. Everything is scoped to #yts-dropdown. */
+
+#yts-dropdown {
+  --yts-bg: #ffffff;
+  --yts-fg: #0f0f0f;
+  --yts-muted: #606060;
+  --yts-hover: rgba(0, 0, 0, 0.05);
+  --yts-active: rgba(0, 0, 0, 0.1);
+  --yts-divider: rgba(0, 0, 0, 0.1);
+  --yts-skeleton: rgba(0, 0, 0, 0.08);
+  --yts-skeleton-shine: rgba(0, 0, 0, 0.03);
+  --yts-accent: #065fd4;
+  --yts-shadow: 0 4px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05);
+
+  position: fixed;
+  z-index: 2300; /* above ytd-masthead (~2020) */
+  width: 300px;
+  max-height: min(70vh, 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  padding: 8px 0;
+  border-radius: 12px;
+  background: var(--yts-bg);
+  color: var(--yts-fg);
+  box-shadow: var(--yts-shadow);
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+#yts-dropdown[hidden] {
+  display: none;
+}
+
+#yts-dropdown.yts-open {
+  opacity: 1;
+  transform: none;
+}
+
+html[dark] #yts-dropdown {
+  --yts-bg: #282828;
+  --yts-fg: #f1f1f1;
+  --yts-muted: #aaaaaa;
+  --yts-hover: rgba(255, 255, 255, 0.1);
+  --yts-active: rgba(255, 255, 255, 0.2);
+  --yts-divider: rgba(255, 255, 255, 0.2);
+  --yts-skeleton: rgba(255, 255, 255, 0.1);
+  --yts-skeleton-shine: rgba(255, 255, 255, 0.05);
+  --yts-accent: #3ea6ff;
+  --yts-shadow: 0 4px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Group label (one per Google account) */
+#yts-dropdown .yts-group-label {
+  padding: 8px 16px 4px;
+  color: var(--yts-muted);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#yts-dropdown .yts-group-label:not(:first-child) {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--yts-divider);
+}
+
+/* Account row */
+#yts-dropdown .yts-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  min-height: 52px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+#yts-dropdown button.yts-row:hover:not(:disabled),
+#yts-dropdown button.yts-row:focus-visible {
+  background: var(--yts-hover);
+  outline: none;
+}
+
+#yts-dropdown button.yts-row:active:not(:disabled) {
+  background: var(--yts-active);
+}
+
+#yts-dropdown .yts-row.yts-selected {
+  cursor: default;
+}
+
+#yts-dropdown .yts-row:disabled:not(.yts-selected):not(.yts-switching) {
+  opacity: 0.5;
+  cursor: default;
+}
+
+#yts-dropdown .yts-avatar {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--yts-skeleton);
+}
+
+#yts-dropdown .yts-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--yts-accent);
+  color: #fff;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+#yts-dropdown .yts-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#yts-dropdown .yts-name,
+#yts-dropdown .yts-byline {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#yts-dropdown .yts-byline {
+  color: var(--yts-muted);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+#yts-dropdown .yts-check {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  fill: var(--yts-fg);
+}
+
+/* Switching state */
+#yts-dropdown .yts-row.yts-switching {
+  background: var(--yts-hover);
+  cursor: progress;
+}
+
+#yts-dropdown .yts-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--yts-accent);
+}
+
+#yts-dropdown .yts-spinner {
+  width: 10px;
+  height: 10px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: yts-spin 0.7s linear infinite;
+}
+
+@keyframes yts-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Loading skeleton */
+#yts-dropdown .yts-skeleton {
+  cursor: default;
+}
+
+#yts-dropdown .yts-skel-line {
+  height: 12px;
+  width: 70%;
+  margin: 4px 0;
+  border-radius: 4px;
+}
+
+#yts-dropdown .yts-skel-short {
+  width: 45%;
+}
+
+#yts-dropdown .yts-skel-avatar,
+#yts-dropdown .yts-skel-line {
+  background: linear-gradient(
+    90deg,
+    var(--yts-skeleton) 25%,
+    var(--yts-skeleton-shine) 50%,
+    var(--yts-skeleton) 75%
+  );
+  background-size: 200% 100%;
+  animation: yts-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes yts-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* Error state */
+#yts-dropdown .yts-error {
+  padding: 12px 16px;
+  text-align: center;
+}
+
+#yts-dropdown .yts-error-title {
+  font-weight: 500;
+}
+
+#yts-dropdown .yts-error-hint {
+  margin-top: 4px;
+  color: var(--yts-muted);
+  font-size: 12px;
+}
+
+#yts-dropdown .yts-retry {
+  margin-top: 12px;
+  padding: 0 16px;
+  height: 36px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--yts-hover);
+  color: var(--yts-accent);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+#yts-dropdown .yts-retry:hover,
+#yts-dropdown .yts-retry:focus-visible {
+  background: var(--yts-active);
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #yts-dropdown,
+  #yts-dropdown * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Fallback scraper: keep YouTube's own popup invisible while we read it. */
+html.yts-scraping ytd-popup-container tp-yt-iron-dropdown {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
