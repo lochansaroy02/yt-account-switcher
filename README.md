@@ -8,6 +8,7 @@ Plain Manifest V3 JavaScript. No build step and no dependencies.
 manifest.json   extension manifest (content script on https://www.youtube.com/*)
 content.js      hover UI, account fetching/parsing, switching
 styles.css      dropdown styles (light + dark)
+icons/          extension icons (16, 32, 48, 128 px)
 ```
 
 There is no background script because everything runs as a same-origin request from the content script.
