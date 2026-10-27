@@ -27,9 +27,19 @@
   const WAIT_TIMEOUT_MS = 3000;
 
   /**
-   * When an account carries YouTube's own sign-in URL (accountSigninToken),
-   * use it to switch — it's what the native menu uses and it handles brand
-   * accounts reliably. Set false to always use ?authuser=N&pageId=X instead.
+   * Switch by clicking the matching row in YouTube's own account menu (opened
+   * invisibly). This runs YouTube's real switch logic, which is the only
+   * method that reliably persists the new account. URL navigation below is
+   * kept as a fallback.
+   */
+  const SWITCH_VIA_NATIVE_MENU = true;
+
+  /** How long to wait for YouTube to navigate after the native click. */
+  const NATIVE_SWITCH_TIMEOUT_MS = 6000;
+
+  /**
+   * URL fallback: when an account carries YouTube's sign-in URL
+   * (accountSigninToken), use it; otherwise ?authuser=N&pageId=X.
    */
   const PREFER_SIGNIN_URL = true;
 
@@ -212,6 +222,7 @@
         const key = `${account.authuser}|${account.pageId}|${account.name}`;
         if (seen.has(key)) continue;
         seen.add(key);
+        account.nativeIndex = accounts.length; // position in the native menu list
         accounts.push(account);
       }
     });
@@ -364,6 +375,33 @@
     return byArrow ? clickable(byArrow) : null;
   }
 
+  /** Finds the native menu row for `account`: by name (+ byline), else by position. */
+  function findNativeAccountRow(account) {
+    const rows = [...document.querySelectorAll('ytd-popup-container ytd-account-item-renderer')];
+    const norm = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    const name = norm(account.name);
+    const byline = norm(account.byline);
+
+    const byName = rows.filter((r) => {
+      const title = norm(textOf(r.querySelector('#channel-title, #account-name')));
+      return title ? title === name : norm(r.textContent).includes(name);
+    });
+    if (byName.length === 1) return byName[0];
+    const byBoth = byName.filter((r) => !byline || norm(r.textContent).includes(byline));
+    if (byBoth.length) return byBoth[0];
+
+    return Number.isInteger(account.nativeIndex) ? rows[account.nativeIndex] || null : null;
+  }
+
+  /** Opens the native menu invisibly and clicks the account's row. */
+  async function clickNativeAccountRow(account) {
+    await openNativeAccountList();
+    const row = findNativeAccountRow(account);
+    if (!row) throw new Error('Native account row not found');
+    log('clicking native account row:', textOf(row).replace(/\s+/g, ' '));
+    (row.querySelector('tp-yt-paper-icon-item') || row).click();
+  }
+
   function closeNativeMenu() {
     if (isNativeMenuOpen() && state.avatar) clickAvatarProgrammatically();
   }
@@ -438,6 +476,7 @@
       try {
         const signin = new URL(account.signinUrl, location.origin);
         if (signin.protocol === 'https:' && ALLOWED_SWITCH_HOSTS.has(signin.hostname)) {
+          if (!signin.searchParams.has('skip_identity_prompt')) signin.searchParams.set('skip_identity_prompt', 'true');
           if (signin.searchParams.has('next')) {
             signin.searchParams.set('next', target.pathname + target.search + target.hash);
             return signin.href;
@@ -457,30 +496,47 @@
     return target.href;
   }
 
-  function switchAccount(account, row) {
+  /**
+   * Switches to `account`. First lets YouTube do it via its own menu; if the
+   * page hasn't started navigating after NATIVE_SWITCH_TIMEOUT_MS, falls back
+   * to URL navigation.
+   */
+  async function switchAccount(account, row) {
     if (account.isSelected || account.isDisabled || state.switching) return;
     state.switching = true;
     state.cache = null;
     setRowSwitching(row);
+    log('switch requested:', account);
 
-    if (account.source === 'scrape') {
-      // No switch tokens available; click the same row in the native menu.
-      withHiddenNativeMenu(async () => {
-        await openNativeAccountList();
-        const items = document.querySelectorAll('ytd-popup-container ytd-account-item-renderer');
-        const target = items[account.nativeIndex];
-        if (!target) throw new Error('Native account row not found');
-        (target.querySelector('tp-yt-paper-icon-item') || target).click();
-      }).catch((err) => {
-        warn('Switch via native menu failed:', err);
-        state.switching = false;
-        renderError('Couldn’t switch account.');
-      });
-      return;
+    let leaving = false;
+    const markLeaving = () => { leaving = true; };
+    const once = { once: true, signal: globalAbort.signal };
+    window.addEventListener('beforeunload', markLeaving, once);
+    document.addEventListener('yt-navigate-start', markLeaving, once);
+
+    if (SWITCH_VIA_NATIVE_MENU && state.avatar) {
+      // Put the playback time in the URL so YouTube's reload keeps it.
+      try { history.replaceState(history.state, '', currentTargetUrl().href); } catch { /* ignore */ }
+
+      const root = document.documentElement;
+      root.classList.add('yts-scraping');
+      try {
+        await clickNativeAccountRow(account);
+        await waitFor(() => leaving, NATIVE_SWITCH_TIMEOUT_MS).catch(() => {});
+        if (leaving) {
+          log('YouTube is switching via its native menu.');
+          return;
+        }
+        warn('Native switch did not navigate; falling back to URL switch.');
+      } catch (err) {
+        warn('Native menu switch failed, falling back to URL switch:', err);
+      }
+      closeNativeMenu();
+      setTimeout(() => root.classList.remove('yts-scraping'), 300);
     }
 
     const url = buildSwitchUrl(account);
-    log('switching to', account.name, '→', url);
+    log('switching via URL to', account.name, '→', url);
     location.assign(url);
   }
 

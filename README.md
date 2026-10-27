@@ -48,7 +48,9 @@ The account list is cached for 5 minutes per tab.
 2. **Fallback 1:** it looks for account data in the inline `ytInitialData` script.
 3. **Fallback 2:** it opens YouTube's own account menu invisibly, goes to "Switch account", reads the rows from the page, and closes the menu again.
 
-**Switching:** if the account has YouTube's own sign-in URL, the extension uses it and sets its `next` to your current page. Otherwise it navigates to the current URL with `?authuser=N` (plus `&pageId=…` for brand accounts). To always use the `authuser` method, set `PREFER_SIGNIN_URL = false` in `content.js`.
+**Switching:** the extension opens YouTube's own account menu invisibly, goes to "Switch account", and clicks the matching row. That way YouTube's own switch logic runs and the new account actually sticks. Before clicking, it adds your playback time (`t=`) to the URL so it survives the reload.
+
+If YouTube hasn't started navigating within 6 seconds, the extension falls back to a URL switch: YouTube's sign-in URL with `next` set to your current page, or `?authuser=N&pageId=…` if there's no sign-in URL. To skip the native menu and always use the URL method, set `SWITCH_VIA_NATIVE_MENU = false` in `content.js`.
 
 The script only runs on `www.youtube.com`. It does nothing on YouTube Studio, music.youtube.com, embeds or iframes.
 
