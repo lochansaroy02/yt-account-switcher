@@ -1,10 +1,10 @@
 #!/bin/sh
-# Builds dist/hover-switcher-<version>.zip for AMO / Chrome Web Store upload.
+# Builds dist/yt-account-switcher-<version>.zip for AMO / Chrome Web Store upload.
 set -eu
 cd "$(dirname "$0")"
 
 version=$(sed -n 's/^ *"version": *"\([^"]*\)".*/\1/p' manifest.json)
-out="dist/hover-switcher-$version.zip"
+out="dist/yt-account-switcher-$version.zip"
 
 if grep -q '^ *const DEBUG = true;' content.js; then
   echo "build.sh: DEBUG is true in content.js; set it to false first." >&2

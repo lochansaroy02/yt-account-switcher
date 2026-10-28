@@ -1,4 +1,4 @@
-# YT Hover Account Switcher
+# YT Account Switcher
 
 Hover the avatar in YouTube's top-right corner to see every account in your browser session (name, handle/email, avatar, a check on the current one). Click one to switch to it, without opening YouTube's account menu.
 
@@ -44,7 +44,7 @@ To run your local changes, open `about:debugging#/runtime/this-firefox`, click *
 
 #### Building a release
 
-Run `./build.sh`. It writes `dist/hover-switcher-<version>.zip`, which you upload to addons.mozilla.org (**On your own**) to get a signed `.xpi`. The script refuses to build while `DEBUG` is `true`.
+Run `./build.sh`. It writes `dist/yt-account-switcher-<version>.zip`, which you upload to addons.mozilla.org (**On your own**) to get a signed `.xpi`. The script refuses to build while `DEBUG` is `true`.
 
 ## Usage
 

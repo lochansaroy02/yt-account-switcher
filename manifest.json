@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Hover Switcher",
+  "name": "YT Account Switcher",
   "version": "1.0.0",
   "description": "Hover the YouTube avatar to see all signed-in accounts and switch with one click.",
   "icons": {
@@ -10,7 +10,7 @@
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "Hover Switcher",
+    "default_title": "YT Account Switcher",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png"

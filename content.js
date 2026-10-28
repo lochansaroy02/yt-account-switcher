@@ -1,5 +1,5 @@
 /*
- * YT Hover Account Switcher — content script.
+ * YT Account Switcher — content script.
  *
  * Hovering the masthead avatar on www.youtube.com shows a dropdown with every
  * account in the browser session. Clicking one switches YouTube to it.
