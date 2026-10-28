@@ -17,7 +17,7 @@
   // ---------------------------------------------------------------------------
 
   /** Logs the raw getAccountSwitcherEndpoint response + parse details. */
-  const DEBUG = true;
+  const DEBUG = false;
 
   const LOG_PREFIX = '[YT-Switcher]';
   const ENDPOINT = '/getAccountSwitcherEndpoint';

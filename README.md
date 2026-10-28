@@ -68,8 +68,8 @@ The script only runs on `www.youtube.com`. It does nothing on YouTube Studio, mu
 2. You should see `[YT-Switcher] initialised` and `attached to avatar button`.
    - If neither appears, the extension isn't running. Check that it's enabled, reload the tab, and in Firefox check the host permission described above.
    - If you see `initialised` but not `attached`, YouTube probably renamed the avatar button. Run `document.querySelector('#avatar-btn')` in the console and report what it returns.
-3. Hover the avatar. With `DEBUG = true` (the default, at the top of `content.js`) the console shows:
+3. Set `DEBUG = true` at the top of `content.js`, reload the extension, and hover the avatar. The console shows:
    - `raw getAccountSwitcherEndpoint response:` followed by the full JSON
    - `parsed accounts:` followed by the extracted list
 4. If the list is empty or wrong, right-click the raw response, choose **Copy string contents**, and share it so the parser can be fixed. **Redact first:** it contains your names, emails, handles and account IDs.
-5. Once everything works, set `DEBUG = false` to stop the verbose logging. Warnings are still printed.
+5. Set `DEBUG = false` again before building a release. Warnings are still printed either way.
