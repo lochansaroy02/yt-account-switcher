@@ -15,7 +15,7 @@ There is no background script because everything runs as a same-origin request f
 
 ## Install
 
-### Chrome / Brave (Linux)
+### Chrome / Brave
 
 1. Open `chrome://extensions` (or `brave://extensions`).
 2. Turn on **Developer mode** (top-right toggle).
@@ -26,13 +26,25 @@ After you edit the code, click the reload icon on the extension card and then re
 
 > Chrome may warn about the unrecognized `browser_specific_settings` key. That key is only for Firefox, so you can ignore the warning.
 
-### Firefox (Linux)
+### Firefox
 
-1. Open `about:debugging#/runtime/this-firefox`.
-2. Click **Load Temporary Add-on…** and select `manifest.json` in this folder.
+Version 1.0.0 is signed by Mozilla, so it installs permanently and survives restarts.
+
+1. Download `hover-switcher-1.0.0.xpi` from the [latest release](https://github.com/lochansaroy02/yt-account-switcher/releases/latest).
+2. Open the file in Firefox (drag it onto a window, or **File → Open File**) and click **Add**.
 3. Open or reload https://www.youtube.com.
 
-Firefox removes temporary add-ons when it restarts, so you'll need to load it again each time. On Firefox versions older than 127, MV3 host access isn't granted automatically. Click the Extensions (puzzle) button, then this extension, then **Always allow on www.youtube.com**.
+On Firefox versions older than 127, MV3 host access isn't granted automatically. Click the Extensions (puzzle) button, then this extension, then **Always allow on www.youtube.com**.
+
+To update, install the newer `.xpi` from the releases page the same way. Firefox replaces the old version.
+
+#### Developing in Firefox
+
+To run your local changes, open `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on…** and select `manifest.json` in this folder. Temporary add-ons are removed when Firefox restarts.
+
+#### Building a release
+
+Run `./build.sh`. It writes `dist/hover-switcher-<version>.zip`, which you upload to addons.mozilla.org (**On your own**) to get a signed `.xpi`. The script refuses to build while `DEBUG` is `true`.
 
 ## Usage
 
